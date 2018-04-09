@@ -5,8 +5,9 @@ using std::cout;
 
 int main()
 {
-    SL<int> list;
+    SmartList<int> list;
     list.insert({ 1, 2, 3, 4, 5 });
+    list.insert(6);
 
     const auto print = [](const auto N) { cout << N << ' '; };
     const auto mul10 = [](auto &num) { num *= 10; };
