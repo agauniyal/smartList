@@ -11,6 +11,8 @@ class SmartList {
         std::unique_ptr<Node> next;
         explicit Node(T val) : value(val), next(nullptr) {}
     };
+
+    size_t len{};
     std::unique_ptr<Node> head{};
 
 public:
@@ -26,12 +28,34 @@ public:
         } else {
             head = std::make_unique<Node>(value);
         }
+        ++len;
     }
 
     auto insert(std::initializer_list<T> &&list)
     {
         for (auto &&value : list) {
             insert(value);
+        }
+    }
+
+    auto remove(const T &value)
+    {
+        if (head) {
+            while (head->value == value) {
+                --len;
+                std::exchange(head, std::move(head->next));
+            }
+
+            Node *current = head->next.get(), *prev = head.get();
+            while (current != nullptr) {
+                if (current->value == value) {
+                    --len;
+                    std::exchange(prev->next, std::move(current->next));
+                } else {
+                    prev = current;
+                }
+                current = prev->next.get();
+            }
         }
     }
 
@@ -57,6 +81,16 @@ public:
         }
         head.release();
         head.reset(previous);
+    }
+
+    auto size() const { return len; }
+    auto empty() const { return len == 0; }
+
+    ~SmartList()
+    {
+        while (head) {
+            std::exchange(head, std::move(head->next));
+        }
     }
 };
 
